@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14
+    container_name: db_migration_postgres
+    restart: unless-stopped # コンテナが停止した場合に自動的に再起動
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db_migration
+    ports:
+      - "15432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data # データ永続化用ボリューム
+
+volumes:
+  db_data:
+    driver: local # ローカルドライバーを使用
