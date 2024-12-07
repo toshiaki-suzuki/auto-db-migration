@@ -8,4 +8,6 @@ node_modules
 cdk.out
 
 # lambda layerのライブラリ配置先
+# .gitkeepを除いて全て無視
 lib/lambda-layer/python/**
+!lib/lambda-layer/python/.gitkeep
