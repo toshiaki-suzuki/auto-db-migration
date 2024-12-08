@@ -103,5 +103,6 @@ def _get_current_version():
     return result.stdout.strip()
 
 
-if __name__ == '__main__':
-    lambda_handler({}, {})
+# ローカルでのテスト用
+# if __name__ == '__main__':
+#     lambda_handler({}, {})
