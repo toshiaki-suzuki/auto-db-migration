@@ -4,24 +4,41 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambda_python from '@aws-cdk/aws-lambda-python-alpha';
 import * as path from 'path';
 import { Provider } from 'aws-cdk-lib/custom-resources';
+import { AuroraPostgresEngineVersion, ClusterInstance, DatabaseCluster, DatabaseClusterEngine, ServerlessCluster } from 'aws-cdk-lib/aws-rds';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 
 export class DbmigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = new Vpc(this, 'DbMigrationVpc', {
-      vpcName: 'db-migration-vpc',
-      cidr: '10.0.0.0/16',
-      maxAzs: 1,
+    const vpc = new Vpc(this, 'db-migration-vpc', {
+      natGateways: 0,
       subnetConfiguration: [
         {
           cidrMask: 24,
-          name: 'PrivateSubnet',
-          subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+          name: 'isolated',
+          subnetType: SubnetType.PRIVATE_ISOLATED,
         },
       ],
-      natGateways: 0,
+    });
+
+    const db = new DatabaseCluster(this, 'DbMigrationAuroraCluster', {
+      engine: DatabaseClusterEngine.auroraPostgres({
+        version: AuroraPostgresEngineVersion.VER_15_7,
+      }),
+      serverlessV2MinCapacity: 0,
+      serverlessV2MaxCapacity: 1,
+      writer: ClusterInstance.serverlessV2('writer'),
+      readers: undefined,
+      enableDataApi: true,
+      iamAuthentication: true,
+      storageEncrypted: true,
+      vpc,
+      vpcSubnets: vpc.selectSubnets({
+        subnetType: SubnetType.PRIVATE_ISOLATED,
+      }),
+      clusterIdentifier: 'db-migration-auroa-cluster',
+      defaultDatabaseName: 'db_migration',
     });
 
     const layer = new lambda_python.PythonLayerVersion(this, "dbMigrationLayer", {
@@ -37,8 +54,9 @@ export class DbmigrationStack extends cdk.Stack {
       handler: 'lambda_handler',
       layers: [layer],
       vpc: vpc,
-      vpcSubnets: { subnets: vpc.privateSubnets },
+      vpcSubnets: { subnetType: SubnetType.PRIVATE_ISOLATED },
     });
+    db.connections.allowDefaultPortFrom(handler);
 
     const provider = new Provider(this, "Provider", {
       onEventHandler: handler,
@@ -46,7 +64,7 @@ export class DbmigrationStack extends cdk.Stack {
 
     new cdk.CustomResource(this, "Custom::Migration", {
       serviceToken: provider.serviceToken,
-      properties: {DummyValue: Date.now().toString(),}, // ダミーのプロパティを設定してリソースの更新をトリガー
+      properties: { DummyValue: Date.now().toString() }, // ダミーのプロパティを設定してリソースの更新をトリガー
     });
   }
 }
