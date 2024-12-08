@@ -18,7 +18,7 @@ export class DbmigrationStack extends cdk.Stack {
       functionName: 'db-migration-function',
       runtime: lambda.Runtime.PYTHON_3_11,
       entry: path.join(__dirname, 'lambda-functions', 'db_migration'),
-      handler: 'index.lambda_handler',
+      handler: 'lambda_handler',
       layers: [layer],
     });
   }
