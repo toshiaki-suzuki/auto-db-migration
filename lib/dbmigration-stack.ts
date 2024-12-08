@@ -4,10 +4,25 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambda_python from '@aws-cdk/aws-lambda-python-alpha';
 import * as path from 'path';
 import { Provider } from 'aws-cdk-lib/custom-resources';
+import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 
 export class DbmigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    const vpc = new Vpc(this, 'DbMigrationVpc', {
+      vpcName: 'db-migration-vpc',
+      cidr: '10.0.0.0/16',
+      maxAzs: 1,
+      subnetConfiguration: [
+        {
+          cidrMask: 24,
+          name: 'PrivateSubnet',
+          subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+        },
+      ],
+      natGateways: 0,
+    });
 
     const layer = new lambda_python.PythonLayerVersion(this, "dbMigrationLayer", {
       layerVersionName: "db-migration-layer",
