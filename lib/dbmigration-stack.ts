@@ -39,7 +39,13 @@ export class DbmigrationStack extends cdk.Stack {
       }),
       clusterIdentifier: 'db-migration-auroa-cluster',
       defaultDatabaseName: 'db_migration',
+      credentials: {
+        username: 'postgres',
+      },
     });
+
+    const dbSecret = db.secret!;
+
 
     const layer = new lambda_python.PythonLayerVersion(this, "dbMigrationLayer", {
       layerVersionName: "db-migration-layer",
@@ -55,8 +61,12 @@ export class DbmigrationStack extends cdk.Stack {
       layers: [layer],
       vpc: vpc,
       vpcSubnets: { subnetType: SubnetType.PRIVATE_ISOLATED },
+      environment: {
+        DB_SECRET_NAME: dbSecret.secretArn,
+      },
     });
     db.connections.allowDefaultPortFrom(handler);
+    dbSecret.grantRead(handler);
 
     const provider = new Provider(this, "Provider", {
       onEventHandler: handler,
