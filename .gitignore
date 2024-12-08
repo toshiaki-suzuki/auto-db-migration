@@ -16,3 +16,6 @@ lib/lambda-layer/python/**
 .env
 
 __pycache__
+
+lib/lambda-functions/db_migration/**
+lib/!lambda-functions/db_migration/index.py
