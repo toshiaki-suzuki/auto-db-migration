@@ -36,6 +36,8 @@ export class DbmigrationStack extends cdk.Stack {
       entry: path.join(__dirname, 'lambda-functions', 'db_migration'),
       handler: 'lambda_handler',
       layers: [layer],
+      vpc: vpc,
+      vpcSubnets: { subnets: vpc.privateSubnets },
     });
 
     const provider = new Provider(this, "Provider", {
