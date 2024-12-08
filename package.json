@@ -9,9 +9,8 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "export-poetry": "poetry export -f requirements.txt --output lib/lambda-layer/python/requirements.txt --without-hashes",
-    "install-python-depemdencies": "pip install -r lib/lambda-layer/python/requirements.txt --target lib/lambda-layer/python/",
-    "set-layer": "npm run export-poetry && npm run install-python-depemdencies"
+    "export-poetry": "poetry export -f requirements.txt --output lib/lambda-layer/requirements.txt --without-hashes",
+    "set-layer": "npm run export-poetry"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
