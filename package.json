@@ -9,10 +9,9 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "export-poetry": "poetry export -f requirements.txt --output lib/lambda-layer/requirements.txt --without-hashes",
-    "set-layer": "npm run export-poetry",
+    "export-poetry": "poetry export -f requirements.txt --output lib/lambda-functions/db_migration/requirements.txt --without-hashes",
     "copy-migration-files": "sh ./scripts/copy-migration-files.sh",
-    "deploy": "npm run set-layer && npm run copy-migration-files && cdk deploy"
+    "deploy": "npm run export-poetry && npm run copy-migration-files && cdk deploy"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

@@ -30,8 +30,8 @@ export class DbmigrationStack extends cdk.Stack {
       engine: DatabaseClusterEngine.auroraPostgres({
         version: AuroraPostgresEngineVersion.VER_15_7,
       }),
-      serverlessV2MinCapacity: 0,
-      serverlessV2MaxCapacity: 1,
+      serverlessV2MinCapacity: 1,
+      serverlessV2MaxCapacity: 2,
       writer: ClusterInstance.serverlessV2('writer'),
       readers: undefined,
       enableDataApi: true,
@@ -50,19 +50,11 @@ export class DbmigrationStack extends cdk.Stack {
 
     const dbSecret = db.secret!;
 
-
-    const layer = new lambda_python.PythonLayerVersion(this, "dbMigrationLayer", {
-      layerVersionName: "db-migration-layer",
-      entry: path.join(__dirname, 'lambda-layer'),
-      compatibleRuntimes: [lambda.Runtime.PYTHON_3_11],
-    });
-
     const handler = new lambda_python.PythonFunction(this, 'dbMigrationFunction', {
       functionName: 'db-migration-function',
       runtime: lambda.Runtime.PYTHON_3_11,
       entry: path.join(__dirname, 'lambda-functions', 'db_migration'),
       handler: 'lambda_handler',
-      layers: [layer],
       vpc: vpc,
       vpcSubnets: { subnetType: SubnetType.PRIVATE_ISOLATED },
       environment: {
