@@ -2,7 +2,7 @@ import logging
 import os
 import subprocess
 import json
-import requests
+import boto3
 
 DB_SECRET_NAME = os.environ.get('DB_SECRET_NAME')
 
@@ -82,12 +82,11 @@ def lambda_handler(event, context):
     }
 
 def _get_secret_string():
-    endpoint = f"http://localhost:2773/secretsmanager/get?secretId={DB_SECRET_NAME}"
-    secrets_headers = {
-        "X-Aws-Parameters-Secrets-Token": os.environ.get("AWS_SESSION_TOKEN"),
-    }
+
     try:
-        response = requests.get(endpoint, headers=secrets_headers)
+        client = boto3.client('secretsmanager')
+        response = client.get_secret_value(SecretId=DB_SECRET_NAME)
+        secret_value = response.get("SecretString", "{}")
         return json.loads(response.json().get("SecretString", "{}"))
     except Exception as error:
         logger.error(f"Failed to get secret string: {error}")
