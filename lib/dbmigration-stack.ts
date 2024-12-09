@@ -35,7 +35,7 @@ export class DbmigrationStack extends cdk.Stack {
       writer: ClusterInstance.serverlessV2('writer'),
       readers: undefined,
       enableDataApi: true,
-      iamAuthentication: true,
+      iamAuthentication: false,
       storageEncrypted: true,
       vpc,
       vpcSubnets: vpc.selectSubnets({
