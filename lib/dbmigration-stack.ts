@@ -41,7 +41,7 @@ export class DbmigrationStack extends cdk.Stack {
       vpcSubnets: vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE_ISOLATED,
       }),
-      clusterIdentifier: 'db-migration-auroa-cluster',
+      clusterIdentifier: 'db-migration-aurora-cluster',
       defaultDatabaseName: 'db_migration',
       credentials: {
         username: 'postgres',
