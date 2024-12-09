@@ -30,7 +30,7 @@ export class DbmigrationStack extends cdk.Stack {
       engine: DatabaseClusterEngine.auroraPostgres({
         version: AuroraPostgresEngineVersion.VER_15_7,
       }),
-      serverlessV2MinCapacity: 1,
+      serverlessV2MinCapacity: 0,
       serverlessV2MaxCapacity: 2,
       writer: ClusterInstance.serverlessV2('writer'),
       readers: undefined,
