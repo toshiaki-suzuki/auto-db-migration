@@ -68,6 +68,7 @@ export class DbmigrationStack extends cdk.Stack {
       environment: {
         DB_SECRET_NAME: dbSecret.secretArn,
       },
+      timeout: cdk.Duration.seconds(300)
     });
     db.connections.allowDefaultPortFrom(handler);
     dbSecret.grantRead(handler);
