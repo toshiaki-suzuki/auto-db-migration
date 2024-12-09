@@ -5,7 +5,7 @@ import * as lambda_python from '@aws-cdk/aws-lambda-python-alpha';
 import * as path from 'path';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { AuroraPostgresEngineVersion, ClusterInstance, DatabaseCluster, DatabaseClusterEngine, ServerlessCluster } from 'aws-cdk-lib/aws-rds';
-import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { InterfaceVpcEndpointAwsService, SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 
 export class DbmigrationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,6 +20,10 @@ export class DbmigrationStack extends cdk.Stack {
           subnetType: SubnetType.PRIVATE_ISOLATED,
         },
       ],
+    });
+
+    vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
+      service: InterfaceVpcEndpointAwsService.SECRETS_MANAGER
     });
 
     const db = new DatabaseCluster(this, 'DbMigrationAuroraCluster', {
